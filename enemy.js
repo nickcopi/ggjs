@@ -70,7 +70,7 @@ class Enemy{
 	attack(time,col){
 		this.setDirection(col,game.scene.collide);
 		this.attackTime = time + this.attackSpeed;
-		col.hp--;
+		col.health--;
 	}
 
 }

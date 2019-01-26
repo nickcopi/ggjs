@@ -79,11 +79,19 @@ class Scene{
 		this.handleInput();
 		this.handleBounds();
 		this.handleEnemies();
+		this.handleCollectibles();
 		this.you.animate(this.time);
 		this.time++;
 	}
 	collide(o1,o2){
 		return (o1.x < o2.x + o2.width && o1.x + o1.width > o2.x && o1.y < o2.y + o2.height && o1.y + o1.height > o2.y) && o1 !== o2;
+	}
+	handleCollectibles(){
+		this.collectibles = this.collectibles.filter(col=>{
+			if(col.health < 0)
+				return false;
+			return true;
+		});
 	}
 	handleBounds(){
 		if(this.you.x < 0) this.you.x = 0;
@@ -150,7 +158,6 @@ class Scene{
 				ctx.drawImage(enemy.img, -(enemy.width/2),-(enemy.height/2),enemy.width, enemy.height);
 				ctx.restore();
 			}
-
 		});
 
 		if(this.night){
