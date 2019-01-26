@@ -51,8 +51,23 @@ class Scene{
 		this.enemyManager = new EnemyManager(sprites.enemies);
 		this.enemyManager.addEnemy(this.enemies);
 		this.time = 0;
-		this.night = true;
+		this.night = false;
+		this.becomeNight();
 		this.you = new You(1450,1100,150,150,sprites.youNight);
+	}
+	becomeNight(){
+		this.canvas.style.width = this.canvas.width + "px";
+		this.canvas.style.height = this.canvas.height + "px";
+		this.canvas.width *= 2;
+		this.canvas.height *= 2;
+		this.night = true;
+	}
+	becomeDay(){
+		this.canvas.style.width = this.canvas.width/2 + "px";
+		this.canvas.style.height = this.canvas.height/2 + "px";
+		this.canvas.width /= 2;
+		this.canvas.height /= 2;
+		this.night = false;
 	}
 	initCanvas(canvas){
 		this.canvas = canvas;
@@ -124,6 +139,12 @@ class Scene{
 			let adjusted = this.cameraOffset(enemy);
 			if(adjusted){
 				ctx.save();
+				if(enemy.attackTime > game.scene.time){
+					let difference = enemy.attackTime - game.scene.time;
+					let offset = difference - enemy.attackSpeed;
+					adjusted.x += enemy.direction.x * offset;
+					adjusted.y += enemy.direction.y * offset;
+				}
 				ctx.translate(adjusted.x+enemy.width/2,adjusted.y+enemy.height/2);
 				ctx.rotate(enemy.angle + Math.PI/2);
 				ctx.drawImage(enemy.img, -(enemy.width/2),-(enemy.height/2),enemy.width, enemy.height);
