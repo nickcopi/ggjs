@@ -14,11 +14,14 @@ class Game{
 		}
 		this.sprites = {
 			bgDay: this.newImage('Assets/bgDay.png'),
+			bgNight: this.newImage('Assets/bgNight.png'),
 			youNight: [this.newImage('Assets/youNightStill.png'), this.newImage('Assets/youNightWalk1.png'), this.newImage('Assets/youNightWalk2.png')],
 			dayItems:{
 				rock1: this.newImage('Assets/rock.png'),
 				rock2: this.newImage('Assets/1rock2.png')
-
+			},
+			enemies:{
+				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
 			}
 
 		}
@@ -42,10 +45,14 @@ class Scene{
 		}, 1000/60);
 		this.keys = [];
 		this.collectibles = [];
+		this.enemies = [];
 		this.itemManager = new ItemManager(sprites.dayItems,sprites.dayItems);
 		this.itemManager.placeRandomItems(10,this.collectibles,sprites,width,height);
+		this.enemyManager = new EnemyManager(sprites.enemies);
+		this.enemyManager.addEnemy(this.enemies);
 		this.time = 0;
-		this.you = new You(10,10,150,150,sprites.youNight);
+		this.night = true;
+		this.you = new You(1450,1100,150,150,sprites.youNight);
 	}
 	initCanvas(canvas){
 		this.canvas = canvas;
@@ -56,6 +63,7 @@ class Scene{
 	update(){
 		this.handleInput();
 		this.handleBounds();
+		this.handleEnemies();
 		this.you.animate(this.time);
 		this.time++;
 	}
@@ -67,6 +75,13 @@ class Scene{
 		if(this.you.y < 0) this.you.y = 0;
 		if(this.you.x + this.you.width > this.width) this.you.x = this.width - this.you.width;
 		if(this.you.y + this.you.height > this.height) this.you.y = this.height - this.you.height;
+	}
+	handleEnemies(){
+		this.enemies.forEach(enemy=>{
+			enemy.setDirection(this.you,this.collide);
+			enemy.move(this.collectibles,this.you,this.width,this.height);
+			enemy.animate(this.time);
+		});
 	}
 	cameraOffset(obj){
 		let adjustedX = (obj.x - (this.you.x)) + canvas.width/2;
@@ -88,7 +103,7 @@ class Scene{
 
 		/*Draw bg*/
 		let adjusted = this.cameraOffset({x:0,y:0,width:this.width, height: this.height});
-		if(adjusted) ctx.drawImage(game.sprites.bgDay,adjusted.x,adjusted.y,this.width,this.height);
+		if(adjusted) ctx.drawImage(this.night?game.sprites.bgNight:game.sprites.bgDay,adjusted.x,adjusted.y,this.width,this.height);
 
 		/*Draw items on map*/
 		this.collectibles.forEach(col=>{
@@ -104,7 +119,25 @@ class Scene{
 		ctx.drawImage(you.img, you.width/-2,you.height/-2,you.width,you.height);
 		ctx.restore();
 
-		
+		/*Draw enemies*/
+		this.enemies.forEach(enemy=>{
+			let adjusted = this.cameraOffset(enemy);
+			if(adjusted){
+				ctx.save();
+				ctx.translate(adjusted.x+enemy.width/2,adjusted.y+enemy.height/2);
+				ctx.rotate(enemy.angle + Math.PI/2);
+				ctx.drawImage(enemy.img, -(enemy.width/2),-(enemy.height/2),enemy.width, enemy.height);
+				ctx.restore();
+			}
+
+		});
+
+		if(this.night){
+			ctx.globalAlpha = 0.3;
+			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,canvas.width,canvas.height);
+			ctx.globalAlpha = 1;
+		}
 	}
 	doPickup(){
 		if(this.you.inventory.length >= this.you.MAX_INVENT)

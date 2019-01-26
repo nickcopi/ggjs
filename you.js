@@ -19,11 +19,18 @@ class You{
 		if(!this.inventory.length) return;
 		let item = this.inventory[this.inventIndex];
 		if(!item) return;
-		item.x = this.x;
-		item.y = this.y;
+		let dropPoint = this.getDropPoint();
+		item.x = dropPoint.x;
+		item.y = dropPoint.y;
 		this.inventory.splice(this.inventIndex,1);
 		collectibles.push(item);
 		this.placeCoolDown = time + 60;
+	}
+	getDropPoint(){
+		return {
+			x: this.x+this.width/2 + this.width/2*Math.cos(this.angle + Math.PI/2),
+			y: this.y+this.height/2+ this.height/2*Math.sin(this.angle + Math.PI/2),
+		}
 	}
 	animate(time){
 		if(this.moving){
