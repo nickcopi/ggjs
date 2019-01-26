@@ -9,12 +9,18 @@ class Game{
 			left: [37,65],
 			right: [68,39],
 			down: [83,40],
-			select: [32]
+			select: [32],
+			drop: [13]
 		}
 		this.sprites = {
 			bgDay: this.newImage('Assets/bgDay.png'),
 			youNight: [this.newImage('Assets/youNightStill.png'), this.newImage('Assets/youNightWalk1.png'), this.newImage('Assets/youNightWalk2.png')],
-			rock: this.newImage('Assets/rock.png')
+			dayItems:{
+				rock1: this.newImage('Assets/rock.png'),
+				rock2: this.newImage('Assets/1rock2.png')
+
+			}
+
 		}
 		this.scene = new Scene(width,height,canvas,this.sprites);
 	}
@@ -36,7 +42,8 @@ class Scene{
 		}, 1000/60);
 		this.keys = [];
 		this.collectibles = [];
-		this.placeRandomItems(10,sprites);
+		this.itemManager = new ItemManager(sprites.dayItems,sprites.dayItems);
+		this.itemManager.placeRandomItems(10,this.collectibles,sprites,width,height);
 		this.time = 0;
 		this.you = new You(10,10,150,150,sprites.youNight);
 	}
@@ -99,11 +106,6 @@ class Scene{
 
 		
 	}
-	placeRandomItems(count,sprites){
-		for(let i = 0; i < count; i++){
-			this.collectibles.push(new Collectable(Math.floor(Math.random()*this.width),Math.floor(Math.random()*this.height),113,129,sprites.rock));
-		}
-	}
 	doPickup(){
 		if(this.you.inventory.length >= this.you.MAX_INVENT)
 			return;
@@ -144,6 +146,11 @@ class Scene{
 		game.keySettings.select.forEach(key=>{
 			if(this.keys[key]){
 				this.doPickup();
+			}
+		});
+		game.keySettings.drop.forEach(key=>{
+			if(this.keys[key]){
+				this.you.doDrop(this.collectibles,this.time);
 			}
 		});
 		let moved = false;
