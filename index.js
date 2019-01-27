@@ -1,6 +1,8 @@
 let game;
 const spriteManager = new SpriteManager();
 const soundFxManager = new SoundFxManager();
+const musicManager = new MusicManager();
+
 class Game{
 	constructor(width,height,canvas){
 		this.width = width;
