@@ -23,7 +23,8 @@ class Game{
 			},
 			enemies:{
 				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
-			}
+			},
+			timerDark: this.newImage('Assets/timerDark.png')
 
 		}
 		this.scene = new Scene(width,height,canvas,this.sprites);
@@ -44,6 +45,8 @@ class Scene{
 			this.update();
 			this.render();
 		}, 1000/60);
+		this.NIGHT_LENGTH = 30*60;
+		this.DAY_LENGTH = 60*60;
 		this.keys = [];
 		this.collectibles = [];
 		this.enemies = [];
@@ -51,9 +54,13 @@ class Scene{
 		this.itemManager.placeRandomItems(10,this.collectibles,sprites,width,height);
 		this.enemyManager = new EnemyManager(sprites.enemies);
 		this.time = 0;
+		this.nightTime = 0;
+		this.dayTime = 0;
+		this.days = 0;
 		this.night = false;
 		this.transitioning = false;
 		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
+		this.becomeNight();
 	}
 	becomeNight(){
 		this.canvas.style.width = this.canvas.width + "px";
@@ -63,6 +70,7 @@ class Scene{
 		this.you.height = 150;
 		this.night = true;
 		this.enemyManager.addEnemy(this.enemies);
+		this.nightTime = 0;
 		//this.transitioning = true;
 	}
 	becomeDay(){
@@ -73,6 +81,8 @@ class Scene{
 		this.you.height = 104;
 		this.night = false;
 		this.enemies = [];
+		this.days++;
+		this.dayTime = 0;
 		//this.transitioning = true;
 	}
 	/*
@@ -102,6 +112,9 @@ class Scene{
 		this.transitionScaleHeight = this.canvas.height;
 		this.canvas.style.width = '1280px';
 		this.canvas.style.height = '720px';
+		this.canvas.addEventListener('blur',()=>{
+			this.keys = [];
+		});
 	}
 	update(){
 		if(this.transitioning){
@@ -112,10 +125,21 @@ class Scene{
 		this.handleEnemies();
 		this.handleCollectibles();
 		this.you.animate(this.time,this.night);
+		this.handleTime();
 		this.time++;
+		if(this.night) this.nightTime++;
+		else this.dayTime++;
 	}
 	collide(o1,o2){
 		return (o1.x < o2.x + o2.width && o1.x + o1.width > o2.x && o1.y < o2.y + o2.height && o1.y + o1.height > o2.y) && o1 !== o2;
+	}
+	handleTime(){
+		if(this.night){
+			if(this.nightTime >= this.NIGHT_LENGTH) this.becomeDay();
+		} else {
+			if(this.dayTime >= this.DAY_LENGTH) this.becomeNight();
+
+		}
 	}
 	handleCollectibles(){
 		this.collectibles = this.collectibles.filter(col=>{
@@ -190,6 +214,20 @@ class Scene{
 				ctx.restore();
 			}
 		});
+
+		/*Draw timer*/
+		if(this.night){
+			ctx.fillStyle = 'rgb(98,211,225)';//moon
+			ctx.fillRect(canvas.width/2 - 274 + this.you.width/2 + 68,60, 384,70)
+			ctx.fillStyle = 'rgb(246,200,118)';//sun
+			let percent = this.nightTime/this.NIGHT_LENGTH;
+			let startX = canvas.width/2 - 274 + this.you.width/2 + 68; 
+			let width = 384 * percent;
+			let x = (startX + 384) - width;
+			ctx.fillRect(x,60, width,70)
+			ctx.drawImage(game.sprites.timerDark,canvas.width/2 - 274 + this.you.width/2,10,274*2,82*2);
+		} else {
+		}
 
 		if(this.night){
 			ctx.globalAlpha = 0.3;
