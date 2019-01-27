@@ -14,7 +14,7 @@ class Game{
 			drop: [13]
 		}
 		this.sprites = spriteManager.sprites;
-		this.scene = new Scene(width,height,canvas,this.sprites);
+		this.scene = new Menu(width,height,canvas,this.sprites);
 	}
 }
 
@@ -127,7 +127,6 @@ class Scene{
 			if(this.nightTime >= this.NIGHT_LENGTH) this.becomeDay();
 		} else {
 			if(this.dayTime >= this.DAY_LENGTH) this.becomeNight();
-
 		}
 	}
 	handleDeadYou(){
@@ -179,7 +178,7 @@ class Scene{
 			if(!this.transTime){
 				let img;
 				if(this.gameOver)
-					img = game.sprites.dayToNight;
+					img = game.sprites.endScreen;
 				else if(this.night)
 					img = game.sprites.dayToNight;
 				else
@@ -188,14 +187,41 @@ class Scene{
 				let drawHeight = canvas.height;
 				let drawWidth = canvas.height/img.height * img.width;
 				ctx.drawImage(img,canvas.width/2 - drawWidth/2,0,drawWidth,drawHeight);
+				if(this.gameOver){
+					ctx.fillStyle = 'white';
+					ctx.font = '100px Arial';
+					ctx.fillText(this.days,1300,840);
+
+				}
 			}
 			this.transTime++;
 			if(this.transTime > 60*3){
 				this.transitioning = false;
+				if(this.gameOver){
+					clearInterval(this.interval);
+					game.scene = new Menu(this.width,this.height,canvas,game.scene.sprites);
+				}
 			}
 			return;
 		}
 		ctx.clearRect(0,0,canvas.width,canvas.height);
+		
+		/*Draw trees*/
+		if(this.night){
+
+		} else {
+			/*
+			let width = game.sprites.dayTree.width * 0.1;
+			let height = game.sprites.dayTree.height * 0.1;
+			for(let x = 0-canvas.width/2; x < this.width+canvas.width/2;x+=width/2){
+				for(let y = 0-canvas.width/2; y < 0;y+=height/2){
+					let adjusted = this.cameraOffset({x:x,y:y,width:width,height:height});
+					if(adjusted) ctx.drawImage(game.sprites.dayTree,adjusted.x,adjusted.y,width,height);
+				}
+			}
+			*/
+
+		}
 
 		/*Draw bg*/
 		let adjusted = this.cameraOffset({x:0,y:0,width:this.width, height: this.height});

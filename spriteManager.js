@@ -23,6 +23,12 @@ class SpriteManager{
 			inventory: this.newImage('Assets/inventory.png'),
 			dayToNight: this.newImage('Assets/dayToNight.png'),
 			nightToDay: this.newImage('Assets/nightToDay.png'),
+			menuBg: this.newImage('Assets/menuBg.png'),
+			menuButtons: this.newImage('Assets/menuButtons.png'),
+			title: this.newImage('Assets/title.png'),
+			titleMarker: this.newImage('Assets/titleMarker.png'),
+			dayTree: this.newImage('Assets/dayTree.png'),
+			endScreen: this.newImage('Assets/endScreen.jpg'),
 
 
 
