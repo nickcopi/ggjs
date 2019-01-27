@@ -25,6 +25,7 @@ class You{
 		item.y = dropPoint.y;
 		this.inventory.splice(this.inventIndex,1);
 		collectibles.push(item);
+		soundFxManager.clop.play();
 		this.placeCoolDown = time + 60;
 	}
 	getDropPoint(){

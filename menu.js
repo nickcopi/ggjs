@@ -53,6 +53,7 @@ class Menu{
 
 	}
 	select(){
+		soundFxManager.select.play();
 		switch(this.index){
 			case 0:
 				clearInterval(this.interval);

@@ -1,5 +1,6 @@
 let game;
-let spriteManager = new SpriteManager();
+const spriteManager = new SpriteManager();
+const soundFxManager = new SoundFxManager();
 class Game{
 	constructor(width,height,canvas){
 		this.width = width;
@@ -27,7 +28,7 @@ class Scene{
 			this.update();
 			this.render();
 		}, 1000/60);
-		this.NIGHT_LENGTH = 30*60;
+		this.NIGHT_LENGTH = 20*60;
 		this.DAY_LENGTH = 60*60;
 		this.keys = [];
 		this.collectibles = [];
@@ -67,7 +68,7 @@ class Scene{
 		this.you.width = 150;
 		this.night = false;
 		this.enemies = [];
-		this.itemManager.placeRandomItems(2+Math.floor(this.days/2),this.collectibles,game.scene.sprites,this.width,this.height);
+		this.itemManager.placeRandomItems(5+Math.floor(this.days/2),this.collectibles,game.scene.sprites,this.width,this.height);
 		this.days++;
 		this.dayTime = 0;
 		this.transTime = 0;
@@ -126,6 +127,9 @@ class Scene{
 		if(this.night){
 			if(this.nightTime >= this.NIGHT_LENGTH) this.becomeDay();
 		} else {
+			if (this.DAY_LENGTH - this.dayTime === 15 * 60) {
+				soundFxManager.bellToll.play();
+			}
 			if(this.dayTime >= this.DAY_LENGTH) this.becomeNight();
 		}
 	}
@@ -330,12 +334,15 @@ class Scene{
 		}
 	}
 	doPickup(){
-		if(this.you.inventory.length >= this.you.MAX_INVENT)
+		if(this.you.inventory.length >= this.you.MAX_INVENT){
+			soundFxManager.oops.play();
 			return;
+		}
 		this.collectibles = this.collectibles.filter(col=>{
 			if(!this.collide(this.you,col)) return true;
 			if(this.you.inventory.length < this.you.MAX_INVENT){
 				this.you.inventory.push(col);
+				soundFxManager.snap.play();
 				return false;
 			}
 			return true;
@@ -440,3 +447,19 @@ window.addEventListener('load',()=>{
 		game.scene.keys[e.keyCode] = false;
 	});
 });
+/*
+let makeTrees = ()=>{
+	let canvas = document.createElement('canvas');
+	let ctx = canvas.getContext('2d');
+	let width = spriteManager.sprites.dayTree.width * 0.1;
+	let height = spriteManager.sprites.dayTree.height * 0.1;
+	for(let x = -2000; x < 5000;x+=width/2){
+		for(let y = -1500; y < 4000;y+=height/2){
+			ctx.drawImage(spriteManager.sprites.dayTree,0,0,width,height);
+		}
+	}
+	spriteManager.sprites.dayTrees = new Image();
+	spriteManager.sprites.dayTrees.src = canvas.toDataURL();
+
+}
+*/

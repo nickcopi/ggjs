@@ -68,6 +68,7 @@ class Enemy{
 		if(this.y + this.height > height) this.y = height - this.height;
 	}
 	attack(time,col){
+		soundFxManager.rip.play();
 		this.setDirection(col,game.scene.collide);
 		this.attackTime = time + this.attackSpeed;
 		col.health--;
