@@ -94,7 +94,8 @@ class Scene {
 		this.night = false;
 		this.transitioning = false;
 		this.you = new You(1450, 1100, 150, 104, sprites.youNight, sprites.youDay);
-		this.becomeNight();
+		this.soundFxManager = soundFxManager;
+		// this.becomeNight();
 	}
 	becomeNight() {
 		this.canvas.style.width = this.canvas.width + 'px';
@@ -182,6 +183,9 @@ class Scene {
 		if (this.night) {
 			if (this.nightTime >= this.NIGHT_LENGTH) this.becomeDay();
 		} else {
+			if (this.DAY_LENGTH - this.dayTime === 15 * 60) {
+				soundFxManager.bellToll.play();
+			}
 			if (this.dayTime >= this.DAY_LENGTH) this.becomeNight();
 		}
 	}
@@ -392,6 +396,7 @@ class Scene {
 			if (!this.collide(this.you, col)) return true;
 			if (this.you.inventory.length < this.you.MAX_INVENT) {
 				this.you.inventory.push(col);
+				this.soundFxManager.snap.play();
 				return false;
 			}
 			return true;
