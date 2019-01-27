@@ -19,13 +19,17 @@ class Game{
 			youDay:[this.newImage('Assets/youDayStill.png'),this.newImage('Assets/youDayWalk1.png'),this.newImage('Assets/youDayWalk2.png')],
 			dayItems:{
 				rock1: this.newImage('Assets/rock.png'),
-				rock2: this.newImage('Assets/1rock2.png')
+				rock2: this.newImage('Assets/1rock2.png'),
+				pipe: this.newImage('Assets/2pipe.png'),
+				table: this.newImage('Assets/3table.png'),
+				log: this.newImage('Assets/3log.png'),
+				trashbin: this.newImage('Assets/2trashbin.png')
 			},
 			enemies:{
 				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
 			},
 			timerDark: this.newImage('Assets/timerDark.png'),
-
+			timerDay: this.newImage('Assets/timerDay.png'),
 			inventory: this.newImage('Assets/inventory.png')
 
 		}
@@ -229,10 +233,38 @@ class Scene{
 			ctx.fillRect(x,60, width,70)
 			ctx.drawImage(game.sprites.timerDark,canvas.width/2 - 274 + this.you.width/2,10,274*2,82*2);
 		} else {
+			ctx.fillStyle = 'rgb(246,200,118)';//sun
+			ctx.fillRect(canvas.width/2 - 274/2 + this.you.width/2 + 46,35, 193,35)
+			ctx.fillStyle = 'rgb(98,211,225)';//moon
+			let percent = this.dayTime/this.DAY_LENGTH;
+			let startX = canvas.width/2 - 274/2 + this.you.width/2 + 46; 
+			let width = 193 * percent;
+			let x = (startX + 193) - width;
+			ctx.fillRect(x,35, width,35)
+			ctx.drawImage(game.sprites.timerDay,canvas.width/2 - 274/2 + this.you.width/2,10,274,82);
 		}
 
 		/*Draw inventory*/
-		//ctx.drawImage(game.sprites.inventory, canvas.width/2 - game.sprites.inventory.width/2, canvas.height - game.sprites.inventory.height - 10);
+		if(!this.night){
+			ctx.drawImage(game.sprites.inventory, canvas.width/2 - 280/2 + this.you.width/2, canvas.height - 74 - 10,280,74);
+			let offset = canvas.width/2 - 280/2 + this.you.width/2 + 13;
+			let distance = 55;
+			let slotWidth = 36;
+			this.you.inventory.forEach((item,i)=>{
+				let drawWidth;
+				let drawHeight;
+				if(item.width > item.height){
+					drawWidth = slotWidth;
+					drawHeight = slotWidth/item.width * item.height;
+				} else {
+					drawHeight = slotWidth;
+					drawWidth = slotWidth/item.height * item.width;
+
+				}
+				ctx.drawImage(item.img,offset + i * distance,canvas.height - 73, drawWidth, drawHeight);
+
+			});
+		}
 
 		if(this.night){
 			ctx.globalAlpha = 0.3;
@@ -330,13 +362,9 @@ class Scene{
 			moved = true;
 		}
 		this.you.moving = moved;
-		
-
 	}
-
-
-
 }
+
 class Background{
 	constructor(x,y,width,height){
 		this.x = x;
