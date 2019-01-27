@@ -27,6 +27,8 @@ class Game{
 			},
 			enemies:{
 				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
+				zombie:[this.newImage('Assets/zombieStill.png'),this.newImage('Assets/zombieWalk1.png'),this.newImage('Assets/zombieWalk2.png')],
+				ghoul:[this.newImage('Assets/ghoulStill.png'),this.newImage('Assets/ghoulWalk1.png'),this.newImage('Assets/ghoulWalk2.png')],
 			},
 			timerDark: this.newImage('Assets/timerDark.png'),
 			timerDay: this.newImage('Assets/timerDay.png'),
@@ -66,7 +68,7 @@ class Scene{
 		this.night = false;
 		this.transitioning = false;
 		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
-		//this.becomeNight();
+		this.becomeNight();
 	}
 	becomeNight(){
 		this.canvas.style.width = this.canvas.width + "px";
@@ -75,7 +77,7 @@ class Scene{
 		this.canvas.height *= 2;
 		this.you.height = 150;
 		this.night = true;
-		this.enemyManager.addEnemy(this.enemies);
+		this.enemyManager.addEnemies(this.enemies,Math.floor(this.days/2) + 3,this.width,this.height);
 		this.nightTime = 0;
 		//this.transitioning = true;
 	}
@@ -214,8 +216,15 @@ class Scene{
 					adjusted.x += enemy.direction.x * offset;
 					adjusted.y += enemy.direction.y * offset;
 				}
+				let angleBonus = 0;
+				if(enemy.frames === this.enemyManager.wolf.frames)
+					angleBonus = Math.PI/2;
+				if(enemy.frames === this.enemyManager.zombie.frames)
+					angleBonus = 3*Math.PI/2;
+				if(enemy.frames === this.enemyManager.ghoul.frames)
+					angleBonus = 3*Math.PI/2;
 				ctx.translate(adjusted.x+enemy.width/2,adjusted.y+enemy.height/2);
-				ctx.rotate(enemy.angle + Math.PI/2);
+				ctx.rotate(enemy.angle + angleBonus);
 				ctx.drawImage(enemy.img, -(enemy.width/2),-(enemy.height/2),enemy.width, enemy.height);
 				ctx.restore();
 			}
