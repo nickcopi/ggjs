@@ -46,5 +46,7 @@ class You{
 		} else {
 			this.img = frames[0];
 		}
+		if(isNight)
+			this.img = frames[3];
 	}
 }

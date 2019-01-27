@@ -1,4 +1,5 @@
 let game;
+let spriteManager = new SpriteManager();
 class Game{
 	constructor(width,height,canvas){
 		this.width = width;
@@ -12,35 +13,8 @@ class Game{
 			select: [32],
 			drop: [13]
 		}
-		this.sprites = {
-			bgDay: this.newImage('Assets/bgDay.png'),
-			bgNight: this.newImage('Assets/bgNight.png'),
-			youNight: [this.newImage('Assets/youNightStill.png'), this.newImage('Assets/youNightWalk1.png'), this.newImage('Assets/youNightWalk2.png')],
-			youDay:[this.newImage('Assets/youDayStill.png'),this.newImage('Assets/youDayWalk1.png'),this.newImage('Assets/youDayWalk2.png')],
-			dayItems:{
-				rock1: this.newImage('Assets/rock.png'),
-				rock2: this.newImage('Assets/1rock2.png'),
-				pipe: this.newImage('Assets/2pipe.png'),
-				table: this.newImage('Assets/3table.png'),
-				log: this.newImage('Assets/3log.png'),
-				trashbin: this.newImage('Assets/2trashbin.png')
-			},
-			enemies:{
-				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
-				zombie:[this.newImage('Assets/zombieStill.png'),this.newImage('Assets/zombieWalk1.png'),this.newImage('Assets/zombieWalk2.png')],
-				ghoul:[this.newImage('Assets/ghoulStill.png'),this.newImage('Assets/ghoulWalk1.png'),this.newImage('Assets/ghoulWalk2.png')],
-			},
-			timerDark: this.newImage('Assets/timerDark.png'),
-			timerDay: this.newImage('Assets/timerDay.png'),
-			inventory: this.newImage('Assets/inventory.png')
-
-		}
+		this.sprites = spriteManager.sprites;
 		this.scene = new Scene(width,height,canvas,this.sprites);
-	}
-	newImage(src){
-		let img = new Image();
-		img.src = src;
-		return img;
 	}
 }
 
@@ -64,22 +38,25 @@ class Scene{
 		this.time = 0;
 		this.nightTime = 0;
 		this.dayTime = 0;
-		this.days = 0;
+		this.days = 1;
 		this.night = false;
+		this.gameOver = false;
 		this.transitioning = false;
 		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
-		this.becomeNight();
+		//this.becomeNight();
 	}
 	becomeNight(){
 		this.canvas.style.width = this.canvas.width + "px";
 		this.canvas.style.height = this.canvas.height + "px";
 		this.canvas.width *= 2;
 		this.canvas.height *= 2;
-		this.you.height = 150;
+		this.you.width = 85;
+		this.you.height = 83;
 		this.night = true;
 		this.enemyManager.addEnemies(this.enemies,Math.floor(this.days/2) + 3,this.width,this.height);
 		this.nightTime = 0;
-		//this.transitioning = true;
+		this.transTime = 0;
+		this.transitioning = true;
 	}
 	becomeDay(){
 		this.canvas.style.width = this.canvas.width/2 + "px";
@@ -87,11 +64,14 @@ class Scene{
 		this.canvas.width /= 2;
 		this.canvas.height /= 2;
 		this.you.height = 104;
+		this.you.width = 150;
 		this.night = false;
 		this.enemies = [];
+		this.itemManager.placeRandomItems(2+Math.floor(this.days/2),this.collectibles,game.scene.sprites,this.width,this.height);
 		this.days++;
 		this.dayTime = 0;
-		//this.transitioning = true;
+		this.transTime = 0;
+		this.transitioning = true;
 	}
 	/*
 	transition(){
@@ -133,6 +113,7 @@ class Scene{
 		this.handleEnemies();
 		this.handleCollectibles();
 		this.you.animate(this.time,this.night);
+		this.handleDeadYou();
 		this.handleTime();
 		this.time++;
 		if(this.night) this.nightTime++;
@@ -148,6 +129,15 @@ class Scene{
 			if(this.dayTime >= this.DAY_LENGTH) this.becomeNight();
 
 		}
+	}
+	handleDeadYou(){
+		this.enemies.forEach(enemy=>{
+			if(this.collide(enemy,this.you)){
+				this.gameOver = true;
+				this.transitioning = true;
+				this.transTime = 0;
+			}
+		});
 	}
 	handleCollectibles(){
 		this.collectibles = this.collectibles.filter(col=>{
@@ -185,6 +175,26 @@ class Scene{
 		let canvas = this.canvas;
 		let ctx = this.ctx;
 		let you = this.you;
+		if(this.transitioning){
+			if(!this.transTime){
+				let img;
+				if(this.gameOver)
+					img = game.sprites.dayToNight;
+				else if(this.night)
+					img = game.sprites.dayToNight;
+				else
+					img = game.sprites.nightToDay;
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+				let drawHeight = canvas.height;
+				let drawWidth = canvas.height/img.height * img.width;
+				ctx.drawImage(img,canvas.width/2 - drawWidth/2,0,drawWidth,drawHeight);
+			}
+			this.transTime++;
+			if(this.transTime > 60*3){
+				this.transitioning = false;
+			}
+			return;
+		}
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 
 		/*Draw bg*/
@@ -252,6 +262,17 @@ class Scene{
 			ctx.fillRect(x,35, width,35)
 			ctx.drawImage(game.sprites.timerDay,canvas.width/2 - 274/2 + this.you.width/2,10,274,82);
 		}
+		/*Draw day*/
+		let text = `Day: ${this.days}`;
+		ctx.fillStyle = 'black';
+		if(this.night){
+			ctx.font = '60px Arial';
+			ctx.fillText(text,canvas.width/2 + this.you.width/2 - ctx.measureText(text).width/2,220);
+		} else {
+			ctx.font = '30px Arial';
+			ctx.fillText(text,canvas.width/2 + this.you.width/2 - ctx.measureText(text).width/2,110);
+		}
+
 
 		/*Draw inventory*/
 		if(!this.night){
@@ -295,6 +316,7 @@ class Scene{
 		});
 	}
 	handleInput(){
+		if(this.night) return;
 		let moveUp = false;
 		let moveDown = false;
 		let moveLeft = false;

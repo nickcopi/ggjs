@@ -33,7 +33,6 @@ class EnemyManager{
 				y = Math.random()>0.5?-300:width + 300;
 
 			}
-			console.log(x,y);
 			enemies.push(new Enemy(x,y,enemy.width,enemy.height,enemy.speed,enemy.frames));
 		}
 	}
