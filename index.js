@@ -90,7 +90,7 @@ class Scene{
 			this.canvas.style.height = this.transitionScaleHeight + 'px';
 			console.log(Math.round(this.transitionScaleWidth) , Math.round(this.canvas.width/2));
 			if(Math.round(this.transitionScaleWidth) === Math.round(this.canvas.width/2)){
-				this.transitioning = false;
+				ehis.transitioning = false;
 			}
 		} else {
 			if(this.canvas.style.width.split('px')[0] === this.canvas.width){
@@ -199,6 +199,8 @@ class Scene{
 				let drawWidth = canvas.height/img.height * img.width;
 				ctx.drawImage(img,canvas.width/2 - drawWidth/2,0,drawWidth,drawHeight);
 				if(this.gameOver){
+					musicManager.day.stop();
+					musicManager.night.stop();
 					soundFxManager.youLose.play();
 					ctx.fillStyle = 'white';
 					ctx.font = '100px Arial';
@@ -212,8 +214,6 @@ class Scene{
 				if(this.gameOver){
 					clearInterval(this.interval);
 					game.scene = new Menu(this.width,this.height,canvas,game.scene.sprites);
-					musicManager.day.stop();
-					musicManager.night.stop();
 				}
 			}
 			return;
@@ -338,9 +338,18 @@ class Scene{
 
 		if(this.night){
 			ctx.globalAlpha = 0.3;
-			ctx.fillStyle = "black";
+			ctx.fillStyle = 'black';
 			ctx.fillRect(0,0,canvas.width,canvas.height);
 			ctx.globalAlpha = 1;
+		} else {
+			if(this.dayTime){
+				ctx.globalAlpha = 0.2 /(this.DAY_LENGTH/this.dayTime);
+				ctx.fillStyle = 'red';
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+				ctx.globalAlpha = 1;
+			}
+			
+			
 		}
 	}
 	doPickup(){
