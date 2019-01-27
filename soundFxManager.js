@@ -11,5 +11,6 @@ class SoundFxManager {
 		this.crumble = new SoundFx('./Assets/crumble.wav');
 		this.snap = new SoundFx('./Assets/snap.wav');
 		this.select = new SoundFx('./Assets/select.wav');
+		this.youLose = new SoundFx('./Assets/youLose.wav');
 	}
 }

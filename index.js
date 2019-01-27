@@ -192,6 +192,7 @@ class Scene{
 				let drawWidth = canvas.height/img.height * img.width;
 				ctx.drawImage(img,canvas.width/2 - drawWidth/2,0,drawWidth,drawHeight);
 				if(this.gameOver){
+					soundFxManager.youLose.play();
 					ctx.fillStyle = 'white';
 					ctx.font = '100px Arial';
 					ctx.fillText(this.days,1300,840);
@@ -199,7 +200,7 @@ class Scene{
 				}
 			}
 			this.transTime++;
-			if(this.transTime > 60*3){
+			if(this.transTime > (this.gameOver?60*3:60*5)){
 				this.transitioning = false;
 				if(this.gameOver){
 					clearInterval(this.interval);
