@@ -14,7 +14,7 @@ class Game{
 			right: [68,39],
 			down: [83,40],
 			select: [32],
-			drop: [13]
+			drop: [13,16]
 		}
 		this.sprites = spriteManager.sprites;
 		this.scene = new Menu(width,height,canvas,this.sprites);
@@ -46,9 +46,12 @@ class Scene{
 		this.gameOver = false;
 		this.transitioning = false;
 		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
+		musicManager.day.play();
 		//this.becomeNight();
 	}
 	becomeNight(){
+		musicManager.day.stop();
+		musicManager.night.play();
 		this.canvas.style.width = this.canvas.width + "px";
 		this.canvas.style.height = this.canvas.height + "px";
 		this.canvas.width *= 2;
@@ -62,6 +65,8 @@ class Scene{
 		this.transitioning = true;
 	}
 	becomeDay(){
+		musicManager.day.play();
+		musicManager.night.stop();
 		this.canvas.style.width = this.canvas.width/2 + "px";
 		this.canvas.style.height = this.canvas.height/2 + "px";
 		this.canvas.width /= 2;
@@ -207,6 +212,8 @@ class Scene{
 				if(this.gameOver){
 					clearInterval(this.interval);
 					game.scene = new Menu(this.width,this.height,canvas,game.scene.sprites);
+					musicManager.day.stop();
+					musicManager.night.stop();
 				}
 			}
 			return;

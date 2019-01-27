@@ -13,6 +13,8 @@ class Menu{
 			this.update();
 			this.render();
 		});
+		musicManager.menu.loop(true);
+		musicManager.menu.play();
 	}
 	initCanvas(canvas){
 		this.canvas = canvas;
@@ -57,6 +59,7 @@ class Menu{
 		switch(this.index){
 			case 0:
 				clearInterval(this.interval);
+				musicManager.menu.stop();
 				game.scene = new Scene(this.width,this.height,this.canvas,game.sprites);
 			break;
 		}

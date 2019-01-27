@@ -8,7 +8,8 @@ class Music {
 	}
 
 	stop() {
-		this.music.stop();
+		this.music.pause();
+		this.music.currenTime = 0;
 	}
 
 	loop(bool) {
