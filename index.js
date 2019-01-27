@@ -24,7 +24,9 @@ class Game{
 			enemies:{
 				wolf:[this.newImage('Assets/wolfStill.png'),this.newImage('Assets/wolfWalk1.png'),this.newImage('Assets/wolfWalk2.png')],
 			},
-			timerDark: this.newImage('Assets/timerDark.png')
+			timerDark: this.newImage('Assets/timerDark.png'),
+
+			inventory: this.newImage('Assets/inventory.png')
 
 		}
 		this.scene = new Scene(width,height,canvas,this.sprites);
@@ -60,7 +62,7 @@ class Scene{
 		this.night = false;
 		this.transitioning = false;
 		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
-		this.becomeNight();
+		//this.becomeNight();
 	}
 	becomeNight(){
 		this.canvas.style.width = this.canvas.width + "px";
@@ -229,6 +231,9 @@ class Scene{
 		} else {
 		}
 
+		/*Draw inventory*/
+		//ctx.drawImage(game.sprites.inventory, canvas.width/2 - game.sprites.inventory.width/2, canvas.height - game.sprites.inventory.height - 10);
+
 		if(this.night){
 			ctx.globalAlpha = 0.3;
 			ctx.fillStyle = "black";
@@ -343,10 +348,10 @@ class Background{
 
 window.addEventListener('load',()=>{
 	game = new Game(2970,2295,document.getElementById('canvas'));
-});
-window.addEventListener('keydown',(e)=>{
-	game.scene.keys[e.keyCode] = true;
-});
-window.addEventListener('keyup',(e)=>{
-	game.scene.keys[e.keyCode] = false;
+	window.addEventListener('keydown',(e)=>{
+		game.scene.keys[e.keyCode] = true;
+	});
+	window.addEventListener('keyup',(e)=>{
+		game.scene.keys[e.keyCode] = false;
+	});
 });

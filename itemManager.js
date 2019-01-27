@@ -14,10 +14,12 @@ class ItemManager{
 			daySprite:daySprites.rock2,
 			nightSprite:nightSprites.rock2
 		}
+		this.items = [this.rock1, this.rock2];
 	}
 	placeRandomItems(count,collectibles,sprites,width,height){
 		for(let i = 0; i < count; i++){
-			collectibles.push(new Collectable(Math.floor(Math.random()*width),Math.floor(Math.random()*height),57,53,sprites.dayItems.rock1,3));
+			let item = this.items[Math.floor(Math.random()*this.items.length)];
+			collectibles.push(new Collectable(Math.floor(Math.random()*width-item.width),Math.floor(Math.random()*height-item.height),item.width,item.height,item.daySprite,item.health));
 		}
 	}
 
