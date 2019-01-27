@@ -16,6 +16,7 @@ class Game{
 			bgDay: this.newImage('Assets/bgDay.png'),
 			bgNight: this.newImage('Assets/bgNight.png'),
 			youNight: [this.newImage('Assets/youNightStill.png'), this.newImage('Assets/youNightWalk1.png'), this.newImage('Assets/youNightWalk2.png')],
+			youDay:[this.newImage('Assets/youDayStill.png'),this.newImage('Assets/youDayWalk1.png'),this.newImage('Assets/youDayWalk2.png')],
 			dayItems:{
 				rock1: this.newImage('Assets/rock.png'),
 				rock2: this.newImage('Assets/1rock2.png')
@@ -49,38 +50,68 @@ class Scene{
 		this.itemManager = new ItemManager(sprites.dayItems,sprites.dayItems);
 		this.itemManager.placeRandomItems(10,this.collectibles,sprites,width,height);
 		this.enemyManager = new EnemyManager(sprites.enemies);
-		this.enemyManager.addEnemy(this.enemies);
 		this.time = 0;
 		this.night = false;
-		this.becomeNight();
-		this.you = new You(1450,1100,150,150,sprites.youNight);
+		this.transitioning = false;
+		this.you = new You(1450,1100,150,104,sprites.youNight,sprites.youDay);
 	}
 	becomeNight(){
 		this.canvas.style.width = this.canvas.width + "px";
 		this.canvas.style.height = this.canvas.height + "px";
 		this.canvas.width *= 2;
 		this.canvas.height *= 2;
+		this.you.height = 150;
 		this.night = true;
+		this.enemyManager.addEnemy(this.enemies);
+		//this.transitioning = true;
 	}
 	becomeDay(){
 		this.canvas.style.width = this.canvas.width/2 + "px";
 		this.canvas.style.height = this.canvas.height/2 + "px";
 		this.canvas.width /= 2;
 		this.canvas.height /= 2;
+		this.you.height = 104;
 		this.night = false;
+		this.enemies = [];
+		//this.transitioning = true;
 	}
+	/*
+	transition(){
+		if(this.night){
+			this.transitionScaleWidth -= this.transitionScaleWidth/60;
+			this.transitionScaleHeight -= this.transitionScaleHeight/60;
+			this.canvas.style.width = this.transitionScaleWidth + 'px';
+			this.canvas.style.height = this.transitionScaleHeight + 'px';
+			console.log(Math.round(this.transitionScaleWidth) , Math.round(this.canvas.width/2));
+			if(Math.round(this.transitionScaleWidth) === Math.round(this.canvas.width/2)){
+				this.transitioning = false;
+			}
+		} else {
+			if(this.canvas.style.width.split('px')[0] === this.canvas.width){
+				this.transitioning = false;
+			}
+		}
+		
+	}*/
 	initCanvas(canvas){
 		this.canvas = canvas;
 		this.ctx = canvas.getContext('2d');
 		this.canvas.height = 720;
 		this.canvas.width = 1280;
+		this.transitionScaleWidth = this.canvas.width;
+		this.transitionScaleHeight = this.canvas.height;
+		this.canvas.style.width = '1280px';
+		this.canvas.style.height = '720px';
 	}
 	update(){
+		if(this.transitioning){
+			return;
+		}
 		this.handleInput();
 		this.handleBounds();
 		this.handleEnemies();
 		this.handleCollectibles();
-		this.you.animate(this.time);
+		this.you.animate(this.time,this.night);
 		this.time++;
 	}
 	collide(o1,o2){
@@ -94,8 +125,8 @@ class Scene{
 		});
 	}
 	handleBounds(){
-		if(this.you.x < 0) this.you.x = 0;
-		if(this.you.y < 0) this.you.y = 0;
+		if(this.you.x < 1) this.you.x = 1;
+		if(this.you.y < 1) this.you.y = 1;
 		if(this.you.x + this.you.width > this.width) this.you.x = this.width - this.you.width;
 		if(this.you.y + this.you.height > this.height) this.you.y = this.height - this.you.height;
 	}

@@ -9,6 +9,7 @@ class EnemyManager{
 	}
 	addEnemy(enemies){
 		enemies.push(new Enemy(10,10,this.wolf.width,this.wolf.height,this.wolf.speed,this.wolf.frames));
+		enemies.push(new Enemy(10,1000,this.wolf.width,this.wolf.height,this.wolf.speed,this.wolf.frames));
 	}
 	static types = {
 		WOLF:1,
