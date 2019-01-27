@@ -11,7 +11,7 @@ class Enemy{
 		this.speed = speed;
 		this.direction = {x:1,y:1};
 		this.attackTime = 0;
-		this.attackSpeed = 60;
+		this.attackSpeed = 70;
 	}
 	dist(x1,y1,x2,y2){
 		return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));

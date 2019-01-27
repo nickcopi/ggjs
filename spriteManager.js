@@ -29,6 +29,7 @@ class SpriteManager{
 			titleMarker: this.newImage('Assets/titleMarker.png'),
 			dayTree: this.newImage('Assets/dayTree.png'),
 			endScreen: this.newImage('Assets/endScreen.jpg'),
+			credits: this.newImage('Assets/credits.png'),
 
 
 

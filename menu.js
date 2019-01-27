@@ -9,6 +9,8 @@ class Menu{
 		this.time = 0;
 		this.index = 0;
 		this.lastMove = 0;
+		this.transitioning = false;
+		this.transTime = 0;
 		this.interval = setInterval(()=>{
 			this.update();
 			this.render();
@@ -28,12 +30,27 @@ class Menu{
 		});
 	}
 	update(){
+		if(this.transitioning) return;
 		this.handleInput();
 		this.time++;
 	}
 	render(){
 		let canvas = this.canvas;
 		let ctx = this.ctx;
+		if(this.transitioning){
+			if(!this.transTime){
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+				let img = spriteManager.sprites.credits;
+				let drawWidth = canvas.width;
+				let drawHeight = canvas.width/img.width * img.height;
+				ctx.drawImage(img,0,0,drawWidth,drawHeight);
+			}
+			this.transTime++;
+			if(this.transTime > 30*60){
+				this.transitioning = false;
+			}
+			return;
+		}
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		let img = game.sprites.menuBg;
 		ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -61,6 +78,10 @@ class Menu{
 				clearInterval(this.interval);
 				musicManager.menu.stop();
 				game.scene = new Scene(this.width,this.height,this.canvas,game.sprites);
+			break;
+			case 1:
+				this.transTime = 0;
+				this.transitioning = true;
 			break;
 		}
 	}
